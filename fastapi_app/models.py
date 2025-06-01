@@ -1,19 +1,10 @@
-def count(N):
-    dp = [0] * (N + 1)
+from sqlalchemy import Table, Column, Integer, String
+from fastapi_app.database import metadata
 
-    dp[1] = A[1]
+users = Table(
+    "users", metadata,
+    Column("id", Integer, primary_key=True),
+    Column("name", String, nullable=False),
+    Column("email", String, nullable=False),
+)
 
-    for i in range(2, N + 1):
-        dp[i] = min(A[i] + dp[i-1], B[i-1] + dp[i-2], C[i-2] + dp[i-3])
-
-    return dp[N]
-
-N = int(input())
-A = []
-B = []
-C = []
-for i in range(N+1):
-    A[i] = int(input())
-    B[i] = int(input())
-    C[i] = int(input())
-print(count(N))

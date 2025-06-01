@@ -1,20 +1,25 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi_app import crud, schemas
+from fastapi_app.database import database
 
 app = FastAPI()
 
-class User(BaseModel):
-    name: str
-    email: str
+@app.on_event("startup")
+async def startup():
+    await database.connect()
 
-# В реальном приложении здесь будет работа с базой данных
-fake_db = []
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
 
-@app.post("/users/")
-def create_user(user: User):
-    fake_db.append(user)
-    return user
+@app.post("/users/", response_model=schemas.UserCreate)
+async def create_user(user: schemas.UserCreate):
+    return await crud.create_user(user)
 
-@app.get("/users/")
-def read_users():
-    return fake_db
+@app.get("/users/", response_model=list[schemas.UserCreate])
+async def get_users():
+    return await crud.get_users()
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello, World!"}
